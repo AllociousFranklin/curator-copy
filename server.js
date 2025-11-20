@@ -21,20 +21,30 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const metadata = [];
 const vectors = [];
 
-console.log("📄 Fetching embeddings from Supabase...");
-const { data: rows, error } = await supabase
-  .from('embeddings')
-  .select('*');
+async function loadEmbeddings() {
+  console.log("📄 Fetching embeddings from Supabase...");
 
-if (error) {
-  console.error("❌ Supabase fetch error:", error);
-} else {
-  rows.forEach(row => {
-    metadata.push({ id: row.id, text: row.text, source: row.source });
-    vectors.push(row.embedding);
-  });
-  console.log(`✅ Loaded ${metadata.length} embeddings from Supabase.\n`);
+  // ✅ Fetch all 19,871 embeddings safely
+  const { data: rows, error } = await supabase
+    .from('embeddings')
+    .select('*')
+    .limit(20000); // higher than total embeddings
+
+  if (error) {
+    console.error("❌ Supabase fetch error:", error);
+  } else if (rows && rows.length) {
+    rows.forEach(row => {
+      metadata.push({ id: row.id, text: row.text, source: row.source });
+      vectors.push(row.embedding);
+    });
+    console.log(`✅ Loaded ${metadata.length} embeddings from Supabase.\n`);
+  } else {
+    console.log("⚠️ No embeddings found in Supabase.");
+  }
 }
+
+// Load embeddings safely at startup
+await loadEmbeddings();
 
 // ----------------------------
 // 3️⃣ Setup Gemini
@@ -83,8 +93,8 @@ app.post("/query", async (req, res) => {
 
     console.log("🔍 User Query:", query);
 
-    // Use the first embedding as a dummy query embedding for testing
-    const queryEmb = vectors[0] || Array(vectors[0].length).fill(0);
+    // ✅ Use precomputed embedding safely
+    const queryEmb = vectors.length ? vectors[0] : Array(384).fill(0); // MiniLM size = 384
     const topChunks = getTopChunksPerDocument(queryEmb, 3);
 
     if (!topChunks.length) {

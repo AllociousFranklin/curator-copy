@@ -1,20 +1,10 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import fs from "fs";
-import readline from "readline";
 import pkg from "@xenova/transformers";
 const { pipeline } = pkg;
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// ----------------------------
-// 🔹 Supabase setup (hardcoded for testing only)
-// ----------------------------
 import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://lfonyzxytcdsvicymxor.supabase.co';
-const supabaseKey = 'YOUR_SUPABASE_SERVICE_ROLE_KEY'; // hardcoded for now
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ----------------------------
 // 1️⃣ Express setup
@@ -24,29 +14,28 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ----------------------------
-// 2️⃣ Load embeddings line-by-line (memory-efficient)
+// 2️⃣ Fetch embeddings from Supabase (hardcoded key for now)
 // ----------------------------
-const embeddingsFile = "embeddings.jsonl";
+const supabaseUrl = 'https://lfonyzxytcdsvicymxor.supabase.co';
+const supabaseKey = 'YOUR_SUPABASE_KEY_HERE';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 const metadata = [];
 const vectors = [];
 
-console.log("📄 Loading embeddings.jsonl...");
-try {
-  const rl = readline.createInterface({
-    input: fs.createReadStream(embeddingsFile),
-    crlfDelay: Infinity,
+console.log("📄 Fetching embeddings from Supabase...");
+const { data: rows, error } = await supabase
+  .from('embeddings')
+  .select('*');
+
+if (error) {
+  console.error("❌ Supabase fetch error:", error);
+} else {
+  rows.forEach(row => {
+    metadata.push({ id: row.id, text: row.text, source: row.source });
+    vectors.push(row.embedding);
   });
-
-  for await (const line of rl) {
-    if (!line.trim()) continue;
-    const obj = JSON.parse(line);
-    metadata.push({ id: obj.id, text: obj.text, source: obj.source });
-    vectors.push(obj.embedding);
-  }
-
-  console.log(`✅ Loaded ${metadata.length} chunks.\n`);
-} catch (err) {
-  console.error("❌ Failed to load embeddings:", err);
+  console.log(`✅ Loaded ${metadata.length} embeddings from Supabase.\n`);
 }
 
 // ----------------------------
@@ -185,5 +174,4 @@ Question: ${query}
 // 8️⃣ Start server
 // ----------------------------
 const PORT = process.env.PORT || 10000;
-
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));

@@ -42,7 +42,7 @@ if (error) {
 // 3️⃣ Load MiniLM embedder
 // ----------------------------
 console.log("📦 Loading MiniLM embedder...");
-const embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+const embedder = await pipeline("embeddings", "Xenova/all-MiniLM-L6-v2");
 console.log("✅ MiniLM ready.\n");
 
 // ----------------------------

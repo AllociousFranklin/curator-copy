@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import pkg from "@xenova/transformers";
 const { pipeline } = pkg;
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 // ----------------------------
 // 1️⃣ Express setup
@@ -14,10 +14,10 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ----------------------------
-// 2️⃣ Fetch embeddings from Supabase (hardcoded key for now)
+// 2️⃣ Fetch embeddings from Supabase
 // ----------------------------
 const supabaseUrl = 'https://lfonyzxytcdsvicymxor.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxmb255enh5dGNkc3ZpY3lteG9yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzU2ODQzNiwiZXhwIjoyMDc5MTQ0NDM2fQ.yVlE8KUFo-1_OcMQbfDgLHeZtQO8321ZX6lZN22Eb_I';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxmb255enh5dGNkc3ZpY3lteG9yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzU2ODQzNiwiZXhwIjoyMDc5MTQ0NDM2fQ.yVlE8KUFo-1_OcMQbfDgLHeZtQO8321ZX6lZN22Eb_I'; // <-- Hardcoded Supabase service role key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const metadata = [];
@@ -39,7 +39,7 @@ if (error) {
 }
 
 // ----------------------------
-// 3️⃣ Load MiniLM embedder
+// 3️⃣ Load MiniLM embedder (Render-compatible embeddings pipeline)
 // ----------------------------
 console.log("📦 Loading MiniLM embedder...");
 const embedder = await pipeline("embeddings", "Xenova/all-MiniLM-L6-v2");
@@ -48,7 +48,7 @@ console.log("✅ MiniLM ready.\n");
 // ----------------------------
 // 4️⃣ Setup Gemini
 // ----------------------------
-const GEMINI_API_KEY = "AIzaSyC0LolRRAUetougA4djxd0oZJEMnwOMxIQ";
+const GEMINI_API_KEY = "AIzaSyC0LolRRAUetougA4djxd0oZJEMnwOMxIQ"; // <-- Hardcoded Google Generative AI key
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
@@ -139,7 +139,7 @@ Question: ${query}
     console.log("Raw Gemini answer:", rawAnswer);
 
     // ----------------------------
-    // 5️⃣ Parse Gemini output (fixed for multiline)
+    // 5️⃣ Parse Gemini output
     // ----------------------------
     let concise = "", detailed = "", sources = [];
     let currentSection = null;
@@ -173,5 +173,5 @@ Question: ${query}
 // ----------------------------
 // 8️⃣ Start server
 // ----------------------------
-const PORT = process.env.PORT || 10000;
+const PORT = 10000; // fixed port works fine on Render free tier
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));

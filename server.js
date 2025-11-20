@@ -3,7 +3,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import fs from "fs";
 import readline from "readline";
-import { pipeline } from "@xenova/transformers";
+import pkg from "@xenova/transformers";
+const { pipeline } = pkg;
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ----------------------------

@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 // 2️⃣ Fetch embeddings from Supabase (hardcoded key for now)
 // ----------------------------
 const supabaseUrl = 'https://lfonyzxytcdsvicymxor.supabase.co';
-const supabaseKey = 'YOUR_SUPABASE_KEY_HERE';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxmb255enh5dGNkc3ZpY3lteG9yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzU2ODQzNiwiZXhwIjoyMDc5MTQ0NDM2fQ.yVlE8KUFo-1_OcMQbfDgLHeZtQO8321ZX6lZN22Eb_I';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const metadata = [];

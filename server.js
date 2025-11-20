@@ -8,6 +8,15 @@ const { pipeline } = pkg;
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ----------------------------
+// 🔹 Supabase setup (hardcoded for testing only)
+// ----------------------------
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://lfonyzxytcdsvicymxor.supabase.co';
+const supabaseKey = 'YOUR_SUPABASE_SERVICE_ROLE_KEY'; // hardcoded for now
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// ----------------------------
 // 1️⃣ Express setup
 // ----------------------------
 const app = express();
@@ -178,4 +187,3 @@ Question: ${query}
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
-
